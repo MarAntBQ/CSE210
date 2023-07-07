@@ -15,6 +15,11 @@ class GoalManager
                 int bonusPoints = (checklistGoal.CompletedCompletions >= checklistGoal.TargetCompletions) ? checklistGoal.BonusPoints : 0;
                 totalScore += (checklistGoal.Points * checklistGoal.CompletedCompletions) + bonusPoints;
             }
+            else if (goal is EternalGoal eternalGoal)
+            {
+                int repeatedTimes = eternalGoal.RepeatedTimes;
+                totalScore += eternalGoal.Points * repeatedTimes;
+            }
             else if (goal.IsCompleted)
             {
                 totalScore += goal.Score;
@@ -42,7 +47,7 @@ class GoalManager
                 Console.WriteLine("Simple goal created successfully.");
                 break;
             case "2":
-                goals.Add(new EternalGoal(name, description, points, false, 0));
+                goals.Add(new EternalGoal(name, description, points, false, 0, 0));
                 Console.WriteLine("Eternal goal created successfully.");
                 break;
             case "3":
@@ -119,7 +124,7 @@ class GoalManager
                 }
                 else if (goal is EternalGoal eternalGoal)
                 {
-                    writer.WriteLine($"EternalGoal:{eternalGoal.Name},{eternalGoal.Description},{eternalGoal.Points}");
+                    writer.WriteLine($"EternalGoal:{eternalGoal.Name},{eternalGoal.Description},{eternalGoal.Points},{eternalGoal.RepeatedTimes}");
                 }
                 else if (goal is ChecklistGoal checklistGoal)
                 {
@@ -176,12 +181,13 @@ class GoalManager
                                 }
                                 break;
                             case "EternalGoal":
-                                if (data.Length == 3)
+                                if (data.Length == 4)
                                 {
                                     string name = data[0];
                                     string description = data[1];
                                     int points = Convert.ToInt32(data[2]);
-                                    goals.Add(new EternalGoal(name, description, points, false, 0));
+                                    int repeatedTimes = Convert.ToInt32(data[3]);
+                                    goals.Add(new EternalGoal(name, description, points, false, 0, repeatedTimes));
                                 }
                                 break;
                             case "CheckListGoal":
@@ -193,10 +199,21 @@ class GoalManager
                                     int bonusPoints = Convert.ToInt32(data[3]);
                                     int targetCompletions = Convert.ToInt32(data[4]);
                                     int completedCompletions = Convert.ToInt32(data[5]);
-                                    goals.Add(new ChecklistGoal(name, description, points, false, targetCompletions, bonusPoints)
-                                    {
-                                        CompletedCompletions = completedCompletions
-                                    });
+                                    bool isCompleted = completedCompletions >= targetCompletions;
+                                    ChecklistGoal checklistGoal = new ChecklistGoal(name, description, points, isCompleted, targetCompletions, bonusPoints);
+                                checklistGoal.CompletedCompletions = completedCompletions;
+
+                                // Determine if it is currently completing or completed
+                                if (completedCompletions < targetCompletions)
+                                {
+                                    checklistGoal.IsCompleted = false;
+                                }
+                                else
+                                {
+                                    checklistGoal.IsCompleted = true;
+                                }
+
+                                goals.Add(checklistGoal);
                                 }
                                 break;
                             default:

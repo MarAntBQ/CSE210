@@ -1,4 +1,4 @@
-620
+640
 SimpleGoal:Simple,About,20,True
-EternalGoal:Eternal,About,20
+EternalGoal:Eternal,About,20,4
 CheckListGoal:Check,About,20,500,3,3
