@@ -7,12 +7,6 @@ class Program
         GoalManager goalManager = new GoalManager();
         string filePath = "goals.txt";
 
-        // Load goals from file (if exists)
-        if (System.IO.File.Exists(filePath))
-        {
-            goalManager.LoadGoals(filePath);
-        }
-
         bool running = true;
         while (running)
         {

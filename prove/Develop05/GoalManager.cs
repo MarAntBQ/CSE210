@@ -107,34 +107,112 @@ class GoalManager
 
     public void SaveGoals(string filePath)
     {
-        List<string> lines = new List<string>();
-        foreach (Goal goal in goals)
+        using (StreamWriter writer = new StreamWriter(filePath))
         {
-            lines.Add(goal.Serialize());
+            writer.WriteLine(GetTotalScore().ToString());
+
+            foreach (Goal goal in goals)
+            {
+                if (goal is SimpleGoal simpleGoal)
+                {
+                    writer.WriteLine($"SimpleGoal:{simpleGoal.Name},{simpleGoal.Description},{simpleGoal.Points},{simpleGoal.IsCompleted}");
+                }
+                else if (goal is EternalGoal eternalGoal)
+                {
+                    writer.WriteLine($"EternalGoal:{eternalGoal.Name},{eternalGoal.Description},{eternalGoal.Points}");
+                }
+                else if (goal is ChecklistGoal checklistGoal)
+                {
+                    writer.WriteLine($"CheckListGoal:{checklistGoal.Name},{checklistGoal.Description},{checklistGoal.Points},{checklistGoal.BonusPoints},{checklistGoal.TargetCompletions},{checklistGoal.CompletedCompletions}");
+                }
+            }
         }
-        System.IO.File.WriteAllLines(filePath, lines);
+
         Console.WriteLine("Goals saved successfully.");
     }
 
     public void LoadGoals(string filePath)
     {
-        if (System.IO.File.Exists(filePath))
+        if (File.Exists(filePath))
         {
-            string[] lines = System.IO.File.ReadAllLines(filePath);
             goals.Clear();
-            foreach (string line in lines)
+
+            using (StreamReader reader = new StreamReader(filePath))
             {
-                Goal goal = Goal.Deserialize(line);
-                if (goal !=null)
+                string line = reader.ReadLine();
+
+                if (int.TryParse(line, out int score))
                 {
-                    goals.Add(goal);
+                    // Set the total score
+                    Console.WriteLine($"Total score set to: {score}");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid file format.");
+                    return;
+                }
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    string[] parts = line.Split(':');
+
+                    if (parts.Length == 2)
+                    {
+                        string goalType = parts[0];
+                        string goalData = parts[1];
+
+                        string[] data = goalData.Split(',');
+
+                        switch (goalType)
+                        {
+                            case "SimpleGoal":
+                                if (data.Length == 4)
+                                {
+                                    string name = data[0];
+                                    string description = data[1];
+                                    int points = Convert.ToInt32(data[2]);
+                                    bool isCompleted = Convert.ToBoolean(data[3]);
+                                    goals.Add(new SimpleGoal(name, description, points, isCompleted, 0));
+                                }
+                                break;
+                            case "EternalGoal":
+                                if (data.Length == 3)
+                                {
+                                    string name = data[0];
+                                    string description = data[1];
+                                    int points = Convert.ToInt32(data[2]);
+                                    goals.Add(new EternalGoal(name, description, points, false, 0));
+                                }
+                                break;
+                            case "CheckListGoal":
+                                if (data.Length == 6)
+                                {
+                                    string name = data[0];
+                                    string description = data[1];
+                                    int points = Convert.ToInt32(data[2]);
+                                    int bonusPoints = Convert.ToInt32(data[3]);
+                                    int targetCompletions = Convert.ToInt32(data[4]);
+                                    int completedCompletions = Convert.ToInt32(data[5]);
+                                    goals.Add(new ChecklistGoal(name, description, points, false, targetCompletions, bonusPoints)
+                                    {
+                                        CompletedCompletions = completedCompletions
+                                    });
+                                }
+                                break;
+                            default:
+                                Console.WriteLine($"Unknown goal type: {goalType}");
+                                break;
+                        }
+                    }
                 }
             }
-            Console.WriteLine("Goals loaded successfully.");
+
+            Console.WriteLine($"Goals loaded successfully.");
         }
         else
         {
             Console.WriteLine("No saved goals found.");
         }
     }
+
 }
