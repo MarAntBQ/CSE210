@@ -4,15 +4,13 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Initialize your e-commerce application
         ECommerceApp app = new ECommerceApp();
 
-        // Display the main menu and handle user interactions
         bool exit = false;
         while (!exit)
         {
             Console.Clear();
-            Console.WriteLine("Marco Antonio E-commerce");
+            Console.WriteLine("Marco Antonio E-commerce BOOT MENU");
             Console.WriteLine("------------------------");
             Console.WriteLine("1. User System");
             Console.WriteLine("2. Admin System");
@@ -41,7 +39,6 @@ class Program
             Console.ReadKey();
         }
 
-        // Exit the application
         Console.WriteLine("Thank you for using Marco Antonio E-commerce. Goodbye!");
     }
 }

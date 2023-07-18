@@ -1,37 +1,51 @@
+using System;
+using System.Collections.Generic;
+
 class Order
 {
-    public DateTime Date { get; set; }
-    public List<Product> Products { get; set; }
-    public float Subtotal { get; set; }
-    public float Taxes { get; set; }
-    public float TotalValue { get; set; }
-
-    public void AddOrder(Order order)
+    public Order()
     {
-        // Add the order to the system
+    }
+    public DateTime Date { get; }
+    public List<Product> Products { get; }
+    public float Subtotal { get; }
+    public float Taxes { get; }
+    public float TotalValue { get; }
+
+    public Order(DateTime date, List<CartItem> cartItems, float subtotal, float taxes)
+    {
+        Date = date;
+        Products = new List<Product>();
+        foreach (var cartItem in cartItems)
+        {
+            Products.Add(cartItem.Product);
+        }
+        Subtotal = subtotal;
+        Taxes = taxes;
+        TotalValue = Subtotal + Taxes;
+    }
+
+    private float CalculateTaxes(float subtotal)
+    {
+        TaxCalculator taxCalculator = new TaxCalculator();
+        return taxCalculator.CalculateTaxes(subtotal);
     }
 
     public string GenerateOrderString()
     {
-        // Generate a string representation of the order
-        return "";
-    }
+        string orderString = "";
+        orderString += $"Order Date: {Date}\n";
+        orderString += "Ordered Products:\n";
 
-    public float CalculateSubtotal()
-    {
-        // Calculate the subtotal based on the selected products
-        return 0;
-    }
+        foreach (Product product in Products)
+        {
+            orderString += $"{product.Name} - {product.Price:C} x {product.Quantity} = {product.Price * product.Quantity:C}\n";
+        }
 
-    public float CalculateTaxes()
-    {
-        // Calculate the taxes based on the subtotal
-        return 0;
-    }
+        orderString += $"Subtotal: {Subtotal:C}\n";
+        orderString += $"Taxes: {Taxes:C}\n";
+        orderString += $"Total Value: {TotalValue:C}\n";
 
-    public float CalculateTotalValue()
-    {
-        // Calculate the total value including taxes
-        return 0;
+        return orderString;
     }
 }

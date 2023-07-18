@@ -1,3 +1,5 @@
+using System;
+
 class Product
 {
     public string Name { get; set; }
@@ -30,8 +32,16 @@ class Product
         return Price;
     }
 
-    public void ReduceStock()
+    public void ReduceStock(int quantityToReduce)
     {
-        // Reduce the quantity in stock
+        if (quantityToReduce <= Quantity)
+        {
+            Quantity -= quantityToReduce;
+            Console.WriteLine($"Reduced {quantityToReduce} units of {Name} from stock.");
+        }
+        else
+        {
+            Console.WriteLine($"Not enough stock for {Name}. Stock available: {Quantity}");
+        }
     }
 }

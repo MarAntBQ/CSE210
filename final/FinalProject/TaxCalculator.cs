@@ -1,8 +1,9 @@
 class TaxCalculator
 {
+    private const float EcuadorTaxRate = 0.12f;
+
     public float CalculateTaxes(float subtotal)
     {
-        // Calculate the taxes based on the subtotal -> Thinking on using Ecuador 12%
-        return 0;
+        return subtotal * EcuadorTaxRate;
     }
 }

@@ -1,24 +1,66 @@
+using System;
+using System.Collections.Generic;
+
+class CartItem
+{
+    public Product Product { get; set; }
+    public int Quantity { get; set; }
+    public float Subtotal => Product.Price * Quantity;
+}
+
 class Cart
 {
-    public List<Product> CartData { get; set; }
+    private List<CartItem> cartItems;
+
+    public Cart()
+    {
+        cartItems = new List<CartItem>();
+    }
 
     public void AddProduct(Product product, int quantity)
     {
-        // Add the product to the cart with the specified quantity
+        CartItem existingItem = cartItems.Find(item => item.Product == product);
+        if (existingItem != null)
+        {
+            existingItem.Quantity += quantity;
+        }
+        else
+        {
+            cartItems.Add(new CartItem { Product = product, Quantity = quantity });
+        }
     }
 
     public void RemoveProduct(Product product)
     {
-        // Remove the product from the cart
+        CartItem existingItem = cartItems.Find(item => item.Product == product);
+        if (existingItem != null)
+        {
+            cartItems.Remove(existingItem);
+        }
     }
 
-    public void CleanCart()
+    public List<CartItem> GetCartItems()
     {
-        // Remove all products from the cart
+        return cartItems;
     }
 
-    public List<Product> GetCartData()
+    public float GetTotal()
     {
-        return CartData;
+        float total = 0;
+        foreach (CartItem cartItem in cartItems)
+        {
+            total += cartItem.Subtotal;
+        }
+        return total;
+    }
+
+    public void ClearCart()
+    {
+        cartItems.Clear();
+    }
+
+    public CartItem GetCartItemByProduct(Product product)
+    {
+        return cartItems.FirstOrDefault(item => item.Product == product);
     }
 }
